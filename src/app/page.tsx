@@ -1,4 +1,5 @@
 "use client";
+
 import React, { useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
 import {
@@ -14,7 +15,7 @@ import Image from "next/image";
 import { DndProvider, useDrag, useDrop } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import uploadedImage from "../app/ImageDemo.jpg";
-import uploadedImage2 from "../app/ImageDemo2.png"; // Use your uploaded image
+import uploadedImage2 from "../app/ImageDemo2.png";
 import CanvasComponent from "../components/CanvasComponent";
 
 interface TooltipProps {
@@ -88,8 +89,8 @@ const DraggableSlide: React.FC<DraggableSlideProps> = ({
     <div
       ref={ref}
       className={`mb-2 p-1 rounded-lg cursor-move ${selectedSlide === slide.id
-          ? "bg-[#FF4D26] bg-opacity-10 border border-[#FF4D26]"
-          : "border border-gray-100"
+        ? "bg-[#FF4D26] bg-opacity-10 border border-[#FF4D26]"
+        : "border border-gray-100"
         }`}
       onClick={() => setSelectedSlide(slide.id)}
       style={{
@@ -183,7 +184,8 @@ const DemoFlow: React.FC = () => {
   const [isPreview, setIsPreview] = useState(false);
   const [isMobile, setIsMobile] = useState<boolean>(false);
 
-  // Check if screen is mobile on component mount and resize
+  const resizeRef = useRef<HTMLDivElement>(null);
+
   useEffect(() => {
     const handleResize = () => {
       setIsMobile(window.innerWidth <= 768);
@@ -194,13 +196,19 @@ const DemoFlow: React.FC = () => {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  const startResizing = () => setIsResizing(true);
-  const stopResizing = () => setIsResizing(false);
+  const startResizing = (e: React.MouseEvent) => {
+    setIsResizing(true);
+    e.preventDefault();
+  };
+
+  const stopResizing = () => {
+    setIsResizing(false);
+  };
 
   const resize = (e: MouseEvent) => {
     if (isResizing) {
       const newWidth = e.clientX;
-      setLeftPanelWidth(Math.max(200, Math.min(newWidth, 320)));
+      setLeftPanelWidth(Math.max(200, Math.min(newWidth, 288)));
     }
   };
 
@@ -250,12 +258,15 @@ const DemoFlow: React.FC = () => {
             <button className="mr-4 p-2 border border-gray-300 rounded-md hover:bg-gray-50 md:block">
               <ChevronLeft className="w-5 h-5 text-gray-500" />
             </button>
-            <button
-              className="mr-4 p-2 border border-gray-300 rounded-md hover:bg-gray-50 md:hidden"
-              onClick={() => setIsMobileLeftPanelOpen((prev) => !prev)}
-            >
-              <Menu className="w-5 h-5 text-gray-500" />
-            </button>
+            {isMobile && (
+              <button
+                className="mr-4 p-2 border border-gray-300 rounded-md hover:bg-gray-50 md:hidden"
+                onClick={() => setIsMobileLeftPanelOpen((prev) => !prev)}
+                >
+                <Menu className="w-5 h-5 text-gray-500" />
+              </button>
+            )}
+
 
             <h1 className="text-xl text-slate-900 font-semibold">
               Name of demo flow
@@ -284,11 +295,11 @@ const DemoFlow: React.FC = () => {
         </header>
 
         <div className="flex flex-1 overflow-hidden">
-          {/* Left Panel - Animate visibility based on isPreview */}
+          {/* Left Panel - Now resizable */}
           <motion.div
             className={`bg-white overflow-y-auto fixed md:relative z-10`}
             animate={{
-              x: isPreview ? -leftPanelWidth : 0,  // Move left panel out of view when in preview mode
+              x: isPreview ? -leftPanelWidth : 0,
             }}
             transition={{ duration: 0.5 }}
             style={{
@@ -323,7 +334,12 @@ const DemoFlow: React.FC = () => {
             </div>
           </motion.div>
 
-
+          {/* Resize handle */}
+          <div
+            ref={resizeRef}
+            className="w-1 cursor-col-resize bg-gray-200 hover:bg-gray-300 transition-colors duration-200"
+            onMouseDown={startResizing}
+          />
 
           {/* Canvas */}
           <div className="bg-dotted flex-1 bg-gray-100 p-4 overflow-auto">
@@ -351,18 +367,18 @@ const DemoFlow: React.FC = () => {
 
               {/* Canvas content */}
               <div className="relative w-full h-[calc(100%-3rem)]">
-                <CanvasComponent/>
+                <CanvasComponent />
                 <Image
                   src={uploadedImage2}
                   alt="Canvas Content"
-                  className="w-[240px] h-auto rounded-md"
+                  className="absolute w-[240px] z-50 h-auto rounded-md"
                   layout="responsive"
                 />
               </div>
             </motion.div>
           </div>
 
-          {/* Right Panel - Animate visibility based on isPreview */}
+          {/* Right Panel */}
           <motion.div
             className="right-panel-holder border-l border-gray-200 fixed md:relative z-10"
             animate={{
@@ -406,78 +422,90 @@ const DemoFlow: React.FC = () => {
               </div>
             </div>
           </motion.div>
-
         </div>
 
         {/* Custom Scrollbar and Dotted Background Styles */}
-        <style jsx global>{`
-          ::-webkit-scrollbar {
-            width: 4px;
-          }
-          ::-webkit-scrollbar-thumb {
-            background-color: #f9fafb;
-            border-radius: 2px;
-          }
-          ::-webkit-scrollbar-track {
-            background-color: #f2f4f7;
-          }
+        <style jsx global>
+          {`
+            ::-webkit-scrollbar {
+              width: 4px;
+            }
+            ::-webkit-scrollbar-thumb {
+              background-color: #f9fafb;
+              border-radius: 2px;
+            }
+            ::-webkit-scrollbar-track {
+              background-color: #f2f4f7;
+            }
 
-          .bg-dotted {
-            background-image: radial-gradient(circle, #c1c1c1 1px, transparent 1px);
-            background-size: 20px 20px;
-            z-index: 0;
-          }
+            .bg-dotted {
+              background-image: radial-gradient(circle, #c1c1c1 1px, transparent 1px);
+              background-size: 20px 20px;
+              z-index: 0;
+            }
 
-          right-panel-holder {
-            width: 84px;
-          }
+            .resize-handle {
+              width: 5px;
+              cursor: ew-resize;
+              background-color: lightgray;
+              position: absolute;
+              top: 0;
+              bottom: 0;
+              right: 0;
+              z-index: 10;
+            }
 
-          .custom-header {
-            display: flex;
-            justify-content: space-between;
-            flex-direction: row;
-          }
+            right-panel-holder {
+              width: 84px;
+            }
 
-          @media (max-width: 768px) {
             .custom-header {
-              flex-direction: column;
-              width: 100%;
-              gap: 16px;
-            }
-            .right-panel {
-              position: fixed;
-              bottom: 10px;
-              left: 50%;
-              transform: translateX(-50%);
-              width: auto;
-              z-index: 20;
+              display: flex;
+              justify-content: space-between;
+              flex-direction: row;
             }
 
-            .right-panel .p-4 {
-              display: flex;
-              flex-direction: column;
-              align-items: center;
-              justify-content: center;
-              space-y: 4;
+            @media (max-width: 768px) {
+              .custom-header {
+                flex-direction: column;
+                width: 100%;
+                gap: 16px;
+              }
+              .right-panel {
+                position: fixed;
+                bottom: 10px;
+                left: 50%;
+                transform: translateX(-50%);
+                width: auto;
+                z-index: 20;
+              }
+
+              .right-panel .p-4 {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                space-y: 4;
+              }
+              .right-panel-custom {
+                display: flex;
+                justify-content: end;
+                align-items: center;
+                gap: 8px;
+                width: 100%;
+              }
+              .space-y-4 > :not([hidden]) ~ :not([hidden]) {
+                --tw-space-y-reverse: 0;
+                margin-top: 0 !important;
+                margin-bottom: 0 !important;
+              }
+              .right-panel-holder {
+                width: 100%;
+                bottom: 24px;
+              }
             }
-            .right-panel-custom {
-              display: flex;
-              justify-content: end;
-              align-items: center;
-              gap: 8px;
-              width: 100%;
-            }
-            .space-y-4 > :not([hidden]) ~ :not([hidden]) {
-              --tw-space-y-reverse: 0;
-              margin-top: 0 !important;
-              margin-bottom: 0 !important;
-            }
-            .right-panel-holder {
-              width: 100%;
-              bottom: 24px;
-            }
-          }
-        `}</style>
+          `}
+        </style>
       </div>
     </DndProvider>
   );

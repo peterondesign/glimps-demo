@@ -14,8 +14,9 @@
 .canvas-container {
   position: relative;
   width: 100%;
-  height: 500px;
-  background-color: #f4f4f4; /* Canvas background */
+  height: 200px;
+  background-color: transparent;
+  z-index: 20;
 }
 
 .tooltip-container {
