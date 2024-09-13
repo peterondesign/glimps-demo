@@ -11,3 +11,86 @@
   }
 }
 
+.canvas-container {
+  position: relative;
+  width: 100%;
+  height: 500px;
+  background-color: #f4f4f4; /* Canvas background */
+}
+
+.tooltip-container {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.pointer-circle {
+  width: 40px;
+  height: 40px;
+  background-color: rgba(255, 69, 0, 0.15); /* Pastel orange outline */
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.pointer-dot {
+  width: 15px;
+  height: 15px;
+  background-color: #FF4D26; /* Solid orange dot */
+  border-radius: 50%;
+}
+
+.tooltip-box {
+  position: relative;
+  background-color: #FF4D26; /* Orange background */
+  color: white;
+  padding: 10px;
+  border-radius: 8px;
+  margin-top: 10px;
+  width: 200px;
+  text-align: left;
+}
+
+.tooltip-arrow {
+  position: absolute;
+  top: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 0;
+  border-left: 10px solid transparent;
+  border-right: 10px solid transparent;
+  border-bottom: 10px solid #FF4D26; /* Arrow pointing from box to pointer */
+}
+
+.tooltip-content {
+  display: flex;
+  flex-direction: column;
+}
+
+.edit-field {
+  background-color: white;
+  border: none;
+  padding: 8px;
+  margin-bottom: 10px;
+  border-radius: 4px;
+  color: #333;
+  width: 100%;
+}
+
+.additional-controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.toggle {
+  display: flex;
+  align-items: center;
+}
+
+input[type='checkbox'] {
+  margin-left: 5px;
+}
